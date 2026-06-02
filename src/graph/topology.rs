@@ -22,3 +22,12 @@ pub trait Topology {
         self.edge_ids().count()
     }
 }
+
+pub trait DirectedTopology: Topology {
+    fn parents(&self, id: Self::NodeId) -> impl Iterator<Item = Self::NodeId> + '_;
+    fn children(&self, id: Self::NodeId) -> impl Iterator<Item = Self::NodeId> + '_;
+
+    fn has_self_loop(&self, id: Self::NodeId) -> bool {
+        self.parents(id).any(|pid| pid == id)
+    }
+}
