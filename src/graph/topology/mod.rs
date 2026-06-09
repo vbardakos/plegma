@@ -5,6 +5,10 @@ pub trait NodeTopology {
     type NodeId: Copy + Eq;
 
     fn node_ids(&self) -> impl Iterator<Item = Self::NodeId> + '_;
+    fn contains(&self, id: Self::NodeId) -> bool {
+        self.node_ids().filter(|&nid| nid == id).next().is_some()
+    }
+
     fn node_count(&self) -> usize {
         self.node_ids().count()
     }
@@ -153,38 +157,56 @@ mod tests {
 
         #[test]
         fn node_count_matches_node_ids_count() {
-            let g = Graph { nodes: vec![1, 2, 3], edges: vec![] };
+            let g = Graph {
+                nodes: vec![1, 2, 3],
+                edges: vec![],
+            };
             assert_eq!(g.node_count(), 3);
         }
 
         #[test]
         fn edge_count_matches_edge_ids_count() {
-            let g = Graph { nodes: vec![1, 2], edges: vec![(1, 2), (2, 1)] };
+            let g = Graph {
+                nodes: vec![1, 2],
+                edges: vec![(1, 2), (2, 1)],
+            };
             assert_eq!(g.edge_count(), 2);
         }
 
         #[test]
         fn opposite_returns_the_other_endpoint_from_either_side() {
-            let g = Graph { nodes: vec![1, 2], edges: vec![(1, 2)] };
+            let g = Graph {
+                nodes: vec![1, 2],
+                edges: vec![(1, 2)],
+            };
             assert_eq!(g.opposite(0, 1), Some(2));
             assert_eq!(g.opposite(0, 2), Some(1));
         }
 
         #[test]
         fn opposite_on_a_self_loop_returns_the_same_node() {
-            let g = Graph { nodes: vec![7], edges: vec![(7, 7)] };
+            let g = Graph {
+                nodes: vec![7],
+                edges: vec![(7, 7)],
+            };
             assert_eq!(g.opposite(0, 7), Some(7));
         }
 
         #[test]
         fn opposite_returns_none_when_node_is_not_an_endpoint() {
-            let g = Graph { nodes: vec![1, 2], edges: vec![(1, 2)] };
+            let g = Graph {
+                nodes: vec![1, 2],
+                edges: vec![(1, 2)],
+            };
             assert_eq!(g.opposite(0, 99), None);
         }
 
         #[test]
         fn opposite_returns_none_when_edge_id_is_unknown() {
-            let g = Graph { nodes: vec![1, 2], edges: vec![] };
+            let g = Graph {
+                nodes: vec![1, 2],
+                edges: vec![],
+            };
             assert_eq!(g.opposite(0, 1), None);
         }
     }
